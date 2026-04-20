@@ -53,8 +53,8 @@ export const TeamGeneration = () => {
         <div className="flex-1 flex flex-row">
             <div className="h-full flex-1">
                 <Field
-                    onHomeLineupChange={setHomeLineup}
-                    onAwayLineupChange={setAwayLineup}
+                    onHomeLineupChange={setAwayLineup}
+                    onAwayLineupChange={setHomeLineup}
                 />
             </div>
             <div className="flex-1 flex flex-col ml-2">
