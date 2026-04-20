@@ -9,27 +9,23 @@ function shuffle<T>(arr: T[]): T[] {
     return a;
 }
 
-const SAMPLE_SIZE = 8;
 
 export function generateTeam(
     candidates: RawCandidate[],
     lineup: Lineup,
     universe: Universe
 ): Player[] {
-    const pool = shuffle(candidates).slice(0, Math.min(SAMPLE_SIZE, candidates.length));
+    const pool = shuffle(candidates);
 
-    const byHeightDesc = [...pool].sort((a, b) => b.height - a.height);
-    const goalie = byHeightDesc[0];
+    const goalie = [...pool].sort((a, b) => b.height - a.height)[0];
 
     const remaining = pool.filter(c => c.id !== goalie.id);
 
-    const byWeightDesc = [...remaining].sort((a, b) => b.weight - a.weight);
-    const defenders = byWeightDesc.slice(0, lineup.defenders);
+    const defenders = [...remaining].sort((a, b) => b.weight - a.weight).slice(0, lineup.defenders);
     const defenderIds = new Set(defenders.map(d => d.id));
 
     const afterDefenders = remaining.filter(c => !defenderIds.has(c.id));
-    const byHeightAsc = [...afterDefenders].sort((a, b) => a.height - b.height);
-    const attackers = byHeightAsc.slice(0, lineup.attackers);
+    const attackers = [...afterDefenders].sort((a, b) => a.height - b.height).slice(0, lineup.attackers);
 
     return [
         { ...goalie, position: 'Goalie', universe },

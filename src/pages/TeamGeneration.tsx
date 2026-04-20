@@ -17,7 +17,7 @@ export const TeamGeneration = () => {
     const awayTeam = useGenerateTeam('pokemon', awayLineup);
 
     const { setMatch } = useMatchProvider()
-    console.log(homeTeam);
+
     const navigate = useNavigate();
     const bothGenerated = homeTeam.players.length > 0 && awayTeam.players.length > 0;
 

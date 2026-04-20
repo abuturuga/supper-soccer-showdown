@@ -1,3 +1,4 @@
+import { Navigate } from "react-router";
 import { computeMatchOverview } from "../logic/computeMatchOverview";
 import { generateMatch } from "../logic/generateMatch";
 import { useMatchProvider } from "../providers/MatchProvider";
@@ -6,6 +7,9 @@ import { ScoreBar } from "../components/ScoreBar";
 export const MatchResults = () => {
     const { getMatch } = useMatchProvider();
     const matchLineup = getMatch();
+
+    if (!matchLineup) return <Navigate to="/" replace />;
+
     const actions = generateMatch(matchLineup.homeTeam.players, matchLineup.awayTeam.players);
     const overview = computeMatchOverview(actions, matchLineup.homeTeam.players, matchLineup.awayTeam.players);
 
