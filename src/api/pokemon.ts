@@ -11,19 +11,24 @@ export async function fetchPokemonCandidates(): Promise<RawCandidate[]> {
     const list = await fetch(
         `https://pokeapi.co/api/v2/pokemon/?limit=${BATCH_SIZE}&offset=${offset}`
     );
+    if (!list.ok) throw new Error(`PokeAPI list error: ${list.status}`);
     const listResponse = await list.json();
 
-    const details = await Promise.all(
-        listResponse.results.map(async (p) => {
+    const results = await Promise.allSettled(
+        listResponse.results.map(async (p: { url: string }) => {
             const response = await fetch(p.url);
-            return await response.json();
+            if (!response.ok) throw new Error(`PokeAPI detail error: ${response.status}`);
+            return response.json();
         })
     );
 
-    return details.map(p => ({
-        id: p.id,
-        name: p.name,
-        height: p.height * 10,  // decimetres → cm
-        weight: p.weight / 10,  // hectograms → kg
-    }));
+    return results
+        .filter((r): r is PromiseFulfilledResult<{ id: number; name: string; height: number; weight: number }> => r.status === 'fulfilled')
+        .map(r => r.value)
+        .map(p => ({
+            id: p.id,
+            name: p.name,
+            height: p.height * 10,  // decimetres → cm
+            weight: p.weight / 10,  // hectograms → kg
+        }));
 }

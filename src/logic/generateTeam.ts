@@ -1,25 +1,13 @@
 import type { Player, RawCandidate, Lineup, Universe } from '../domain';
 
-function shuffle<T>(arr: T[]): T[] {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-
 export function generateTeam(
     candidates: RawCandidate[],
     lineup: Lineup,
     universe: Universe
 ): Player[] {
-    const pool = shuffle(candidates);
+    const goalie = [...candidates].sort((a, b) => b.height - a.height)[0];
 
-    const goalie = [...pool].sort((a, b) => b.height - a.height)[0];
-
-    const remaining = pool.filter(c => c.id !== goalie.id);
+    const remaining = candidates.filter(c => c.id !== goalie.id);
 
     const defenders = [...remaining].sort((a, b) => b.weight - a.weight).slice(0, lineup.defenders);
     const defenderIds = new Set(defenders.map(d => d.id));

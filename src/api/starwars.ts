@@ -12,6 +12,7 @@ export async function fetchStarWarsCandidates(): Promise<RawCandidate[]> {
     const response = await fetch(
         `https://swapi.dev/api/people/?page=${page}`
     );
+    if (!response.ok) throw new Error(`SWAPI error: ${response.status}`);
     const result = await response.json();
 
     return result.results
