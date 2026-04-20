@@ -106,7 +106,7 @@ export const Field = ({
     onAwayLineupChange: (l: Lineup) => void;
 }) => {
     return (
-        <div className="relative flex flex-col bg-green-600 h-full border-4 border-white rounded-sm overflow-hidden">
+        <div className="relative flex flex-col bg-green-600 h-full border-4 border-white rounded-xl overflow-hidden shadow">
             {/* Top penalty area */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[18%] border-2 border-white border-t-0" />
             {/* Top goal area */}

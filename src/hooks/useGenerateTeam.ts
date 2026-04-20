@@ -30,7 +30,7 @@ export function useGenerateTeam(universe: Universe, lineup: Lineup) {
 
     return {
         players: query.data ?? [],
-        isLoading: query.isLoading,
+        isLoading: query.isFetching,
         error: query.error?.message,
         generate: () => setGenerateId(Date.now()),
         name: teamNames.get(universe),
