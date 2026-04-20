@@ -1,53 +1,6 @@
-type SoccerEvent =
-    | "initMatch"
-    | "ballPossession"
-    | "pass"
-    | "advanceWithBall"
-    | "attemptShot"
-    | "crossTheBall"
-    | "interception"
-    | "goalScored"
-    | "shotMissed"
-    | "goalieRelease";
+import type { Action, Player } from '../domain';
+import { generateRandomNumber } from './utils';
 
-type Universe = 'starwars' | 'pokemon';
-
-type Position = 'Goalie' | 'Defence' | 'Offence';
-
-type Player = {
-    id: number;
-    name: string;
-    weight: number;
-    height: number;
-    position: Position;
-    universe: Universe;
-};
-
-const firstTeam: Player[] = [
-    { id: 1, name: 'Mewtwo', weight: 122, height: 200, position: 'Goalie', universe: 'pokemon' },
-    { id: 2, name: 'Machamp', weight: 130, height: 160, position: 'Defence', universe: 'pokemon' },
-    { id: 3, name: 'Snorlax', weight: 460, height: 210, position: 'Defence', universe: 'pokemon' },
-    { id: 4, name: 'Pikachu', weight: 6, height: 40, position: 'Offence', universe: 'pokemon' },
-    { id: 5, name: 'Lucario', weight: 54, height: 120, position: 'Offence', universe: 'pokemon' }
-];
-
-const secondTeam: Player[] = [
-    { id: 6, name: 'Chewbacca', weight: 112, height: 228, position: 'Goalie', universe: 'starwars' },
-    { id: 7, name: 'Darth Vader', weight: 120, height: 203, position: 'Defence', universe: 'starwars' },
-    { id: 8, name: 'Bobba Fett', weight: 78, height: 183, position: 'Defence', universe: 'starwars' },
-    { id: 9, name: 'Luke Skywalker', weight: 77, height: 172, position: 'Offence', universe: 'starwars' },
-    { id: 10, name: 'Ahsoka Tano', weight: 56, height: 170, position: 'Offence', universe: 'starwars' }
-];
-
-type ActionPayload = {
-    player?: Player;
-    teamId?: 'first' | 'second';
-};
-
-type Action = {
-    event: SoccerEvent;
-    paylod: ActionPayload;
-}
 
 type GenerateActionParams = {
     action: Action;
@@ -55,8 +8,6 @@ type GenerateActionParams = {
     secondTeam: Player[];
     chance: number;
 };
-
-const generateRandomNumber = (max: number) => Math.floor(Math.random() * max);
 
 const generateAction = ({ action, firstTeam, secondTeam, chance }: GenerateActionParams): Action => {
     const { event, paylod } = action;
@@ -133,7 +84,7 @@ const generateAction = ({ action, firstTeam, secondTeam, chance }: GenerateActio
     }
 };
 
-const playMatch = () => {
+export const generateMatch = (firstTeam: Player[], secondTeam: Player[]) => {
     const actions: Action[] = [];
     const MINUTES = 90;
 
@@ -157,6 +108,3 @@ const playMatch = () => {
 
     return actions;
 };
-
-const actions = playMatch();
-console.log(actions);

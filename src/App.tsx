@@ -1,11 +1,16 @@
-import './App.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Router } from './Router';
+import { MatchProvider } from './providers/MatchProvider';
+
+const queryClient = new QueryClient()
 
 function App() {
-
   return (
-    <div>
-      <h1>Supper Soccer Showdown</h1>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <MatchProvider>
+        <Router />
+      </MatchProvider>
+    </QueryClientProvider>
   )
 }
 

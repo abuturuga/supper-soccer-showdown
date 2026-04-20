@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# Supper Soccer Showdown
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## UX
 
-Currently, two official plugins are available:
+![UX Mock](docs/ux-mock.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+2 main pages - Lineup Settings and Live Match. Home page is out of scope for now.
 
-## React Compiler
+**Lineup Settings** - configure and generate teams. Play button only shows up after both teams are ready.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3 states to handle:
+- empty - pick a universe, generate becomes available
+- error - one of the apis blew up, show error + retry
+- ready - teams are on the field, can play or regenerate
 
-## Expanding the ESLint configuration
+loading is shown in the player table, not on the field itself
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Live Match** - score, field positions, highlights, stats
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React 19
+- TypeScript
+- React Router 7
+- TanStack React Query 4
+- TailwindCSS 4
+- Vite
+
+## Architecture
+
+### State
+
+2 layers:
+- `MatchProvider` (context) - keeps home/away teams alive across pages
+- local state - lineup config (defenders, attackers), stays in the component
+
+React Query handles the async stuff - loading/error/cache. `staleTime: Infinity` so teams dont get refetched mid session.
+
+### APIs
+
+Just plain fetch, no axios or anything. Two files in `/src/api/`:
+- `pokemon.ts` - PokeAPI
+- `starwars.ts` - SWAPI
+
+Both are paginated. `useGenerateTeam` hook wraps them with react query, 3 retries with delay if something fails.
+
+### Flow
+
+```
+user triggers generate
+  → useGenerateTeam (react query)
+    → /src/api/*
+      → generateTeam.ts (pure fn)
+        → MatchProvider
+          → Live Match page
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+all business logic is pure functions in `/src/logic/`, nothing react specific in there
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Team Generation
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+![Team Generation Overview](docs/team-generation-overview.png)
+
+fetch a random page from the paginated api, grab total count, normalize via adapter if needed. useQuery calls it and retries on fail. team generation runs after with the lineup config.
+
+### Match Simulation
+
+![Live Match Diagram](docs/live-match-diagram.png)
+
+Implemented as a state machine.
