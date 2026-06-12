@@ -139,3 +139,5 @@ Small change
 
 Feat com
 Feature commit
+
+Feat adding a new feature
